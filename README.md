@@ -69,7 +69,7 @@ nextjs-polling-app
    npm run dev
    ```
 
-5. Open your browser and go to `http://localhost:3000` to view the application.
+5. Open your browser and go to `http://localhost:3010` to view the application.
 
 ## Technologies Used
 
@@ -81,3 +81,7 @@ nextjs-polling-app
 ## Contributing
 
 Feel free to submit issues or pull requests for any improvements or features you'd like to see!
+
+## Development Ports
+- Main Development: http://localhost:3000
+- Docker Compose: http://localhost:3010
