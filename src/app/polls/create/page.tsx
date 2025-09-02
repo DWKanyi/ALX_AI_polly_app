@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import withAuth from '@/app/auth/withAuth';
 
 const CreatePollPage = () => {
   const [pollTitle, setPollTitle] = useState('');
@@ -61,4 +62,4 @@ const CreatePollPage = () => {
   );
 };
 
-export default CreatePollPage;
+export default withAuth(CreatePollPage);

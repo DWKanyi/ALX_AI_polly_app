@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { PollCard, Poll } from '@/components/ui/pollCard';
 import { fetchPolls } from '@/lib/api';
+import withAuth from '@/app/auth/withAuth';
 
 const ViewPollsPage = () => {
   const [polls, setPolls] = useState<Poll[]>([]);
@@ -59,4 +60,4 @@ const ViewPollsPage = () => {
   );
 };
 
-export default ViewPollsPage;
+export default withAuth(ViewPollsPage);

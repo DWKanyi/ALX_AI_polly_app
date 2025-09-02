@@ -1,13 +1,16 @@
 import React from 'react';
 import Navbar from '../components/navbar';
 import '../styles/globals.css';
+import { AuthProvider } from './auth/context/AuthContext';
 
 const Layout = ({ children }) => {
   return (
     <html lang="en">
       <body>
-        <Navbar />
-        <main>{children}</main>
+        <AuthProvider>
+          <Navbar />
+          <main>{children}</main>
+        </AuthProvider>
       </body>
     </html>
   );

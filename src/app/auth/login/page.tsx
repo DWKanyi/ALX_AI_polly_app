@@ -3,22 +3,37 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { supabase } = useAuth();
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add login logic here using the auth library
-    // Example: await login(email, password);
-    router.push('/polls/view'); // Redirect to polls after successful login
+    setError(null);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) {
+        setError(error.message);
+      } else {
+        router.push('/polls/view');
+      }
+    } catch (error) {
+      setError('An unexpected error occurred.');
+    }
   };
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
       <h1 className="text-2xl font-bold mb-4">Login</h1>
+      {error && <p className="text-red-500">{error}</p>}
       <form onSubmit={handleLogin} className="flex flex-col space-y-4">
         <input
           type="email"
