@@ -1,0 +1,115 @@
+---
+description: Scaffolding and code generation patterns for transforming polling app to other domains
+globs: **/*.tsx, **/*.ts, app/**/*.tsx, components/**/*.tsx
+alwaysApply: true
+---
+
+# Scaffolding and Transformation Rules
+
+## Resource Transformation Patterns
+
+- Replace "poll" with target resource name throughout codebase
+- Update all TypeScript interfaces with new field names
+- Modify database schema to match new domain requirements
+- Update validation schemas in lib/validations/ directory
+- Rename component files and directories appropriately
+- Update import statements and file references
+
+## CRUD Generation Standards
+
+- Generate complete resource pages: list, create, detail, edit
+- Create corresponding API routes with full CRUD operations
+- Build form components with appropriate validation
+- Include loading and error states for all operations
+- Implement proper navigation between related pages
+- Add confirmation dialogs for destructive actions
+
+## Component Scaffolding Rules
+
+- Use consistent file naming: PascalCase for components
+- Include proper TypeScript interfaces for all props
+- Implement responsive design with Tailwind classes
+- Add proper accessibility attributes (ARIA, roles, etc.)
+- Include hover and focus states for interactive elements
+- Follow established component structure patterns
+
+## Database Schema Generation
+
+- Always include standard fields: id, user_id, created_at, updated_at
+- Add domain-specific fields based on requirements
+- Create proper foreign key relationships
+- Generate RLS policies for new tables
+- Include appropriate indexes for query performance
+- Add data validation constraints at database level
+
+## API Route Scaffolding
+
+- Generate RESTful endpoints following established patterns
+- Include proper authentication checks in all routes
+- Implement consistent error handling and responses
+- Add request/response validation with Zod schemas
+- Include proper HTTP status codes for different scenarios
+- Add comprehensive error logging for debugging
+
+## Form Generation Standards
+
+- Create forms using React Hook Form with Zod validation
+- Include all necessary form fields based on data model
+- Add proper field validation rules and error messages
+- Implement dynamic field management where needed
+- Include loading states and submission feedback
+- Add cancel and reset functionality
+
+## Navigation and Routing
+
+- Generate proper route structure following App Router conventions
+- Create navigation components with active state indicators
+- Implement breadcrumb navigation for nested resources
+- Add proper page titles and meta descriptions
+- Include loading and error pages for each route
+- Implement proper 404 handling for missing resources
+
+## Real-time Features Integration
+
+- Add Supabase real-time subscriptions for live updates
+- Implement optimistic updates for better user experience
+- Handle connection states and error scenarios
+- Create proper cleanup for subscription management
+- Add visual indicators for real-time status
+- Batch updates to prevent performance issues
+
+## Testing Scaffold Generation
+
+- Generate unit tests for new utility functions
+- Create component tests for user interactions
+- Add API route tests with proper mocking
+- Include integration tests for complete user flows
+- Test error scenarios and edge cases
+- Verify accessibility compliance
+
+## Domain-Specific Adaptations
+
+- For task management: Add priority, status, assignee fields
+- For event management: Add location, date, capacity fields
+- For survey systems: Add question types, response analysis
+- For recipe sharing: Add ingredients, instructions, ratings
+- For marketplace: Add pricing, categories, inventory
+- For social features: Add following, likes, comments
+
+## Code Quality Standards
+
+- Maintain consistent code formatting and style
+- Include proper TypeScript types for all generated code
+- Add comprehensive JSDoc comments for complex functions
+- Follow established naming conventions throughout
+- Implement proper error boundaries and fallback UI
+- Ensure responsive design across all generated components
+
+## Migration Assistance Patterns
+
+- Generate database migration scripts for schema changes
+- Create data transformation utilities for existing data
+- Provide rollback procedures for failed migrations
+- Include data validation checks before and after migrations
+- Generate backup and restore procedures
+- Document breaking changes and upgrade paths

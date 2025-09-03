@@ -1,0 +1,120 @@
+---
+description: React Hook Form with Zod validation and shadcn/ui form patterns for polling app
+globs: components/forms/**/*.tsx, app/**/create/**/*.tsx, app/**/edit/**/*.tsx
+alwaysApply: true
+---
+
+# Form Development Rules
+
+## Form Component Structure
+
+- Always start client components with 'use client' directive
+- Import React Hook Form, Zod resolver, and validation schema
+- Define TypeScript interface for form data using z.infer
+- Include isSubmitting state for loading indicators
+- Use useRouter for navigation after successful submission
+- Always include both submit and cancel buttons
+
+## Required Imports Pattern
+
+```typescript
+'use client'
+
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+```
+
+## Validation Schema Requirements
+
+- Define schemas in lib/validations/ directory
+- Use descriptive error messages for all validations
+- Include minimum/maximum length validations where appropriate
+- Use .optional() for non-required fields
+- Validate email formats, URLs, and other specific formats
+- Include custom validation functions for business logic
+
+## Form Configuration Standards
+
+- Always use zodResolver for form resolver
+- Set appropriate defaultValues for all form fields
+- Handle both create and edit modes in same component
+- Use form.formState.isSubmitting for loading states
+- Reset form after successful submission when appropriate
+- Implement form.setValue() for dynamic field updates
+
+## Form Submission Pattern
+
+- Always wrap submission in try-catch block
+- Set isSubmitting state before and after API calls
+- Use appropriate HTTP methods (POST for create, PUT for update)
+- Include Content-Type: application/json header
+- Handle both success and error responses appropriately
+- Navigate to appropriate page after successful submission
+- Show user feedback for both success and error states
+
+## Form Field Patterns
+
+- Use FormField wrapper for all form inputs
+- Include FormLabel for accessibility
+- Wrap inputs in FormControl component
+- Always include FormMessage for validation errors
+- Use appropriate input types (text, email, textarea, select)
+- Include placeholder text for better UX
+- Apply consistent styling classes
+
+## Dynamic Form Fields
+
+- Use useFieldArray for dynamic lists (like poll options)
+- Include add/remove buttons with proper icons
+- Validate minimum and maximum field counts
+- Show clear visual feedback for field additions/removals
+- Handle array field validation properly
+- Maintain focus management when adding/removing fields
+
+## Form Validation Messages
+
+- Provide specific, actionable error messages
+- Use consistent language and tone across all forms
+- Include field labels in error messages for clarity
+- Validate on both client and server side
+- Show real-time validation feedback where appropriate
+- Clear validation errors when user corrects input
+
+## Form Accessibility
+
+- Include proper ARIA labels and descriptions
+- Ensure keyboard navigation works correctly
+- Use semantic HTML elements
+- Provide clear focus indicators
+- Include proper error announcements for screen readers
+- Test with keyboard-only navigation
+
+## Form States Management
+
+- Show loading spinner during form submission
+- Disable form fields during submission
+- Clear form errors on successful submission
+- Maintain form data during navigation (when appropriate)
+- Handle browser back/forward navigation properly
+- Preserve form state across component re-renders
+
+## Specialized Form Types
+
+- Use date pickers for date/time fields
+- Implement rich text editors for long content
+- Use file upload components for media
+- Include autocomplete for search fields
+- Implement multi-step forms with proper navigation
+- Use conditional fields based on user selections

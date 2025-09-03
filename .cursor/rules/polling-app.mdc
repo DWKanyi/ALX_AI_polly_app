@@ -1,0 +1,132 @@
+---
+description: Polling App with Next.js, Supabase, shadcn/ui and React Hook Form best practices
+globs: /.tsx, **/.ts, app//.tsx, app/**/.ts, components//*.tsx, lib//*.ts
+alwaysApply: true
+---
+
+# Polling App Development Rules
+
+## Project Architecture
+
+-Use Next.js 14+ App Router exclusively (never Pages Router)
+-Implement TypeScript with strict mode enabled
+-Use Supabase for database, auth, and real-time features
+-Use shadcn/ui components for all UI elements
+-Use React Hook Form with Zod for all forms
+-Use Tailwind CSS for styling (no custom CSS unless critical)
+-Follow the established folder structure strictly
+
+## Folder Structure Requirements
+
+-Place route pages in app/ directory following App Router conventions
+-Group auth pages in app/(auth)/ route group
+-Group protected pages in app/(dashboard)/ route group
+-Place resource pages in app/[resource]/ with nested routes
+-Place API routes in app/api/[resource]/route.ts
+-Place form components in components/forms/
+-Place resource-specific components in components/[resource]/
+-Place shadcn/ui components only in components/ui/
+-Place database queries in lib/supabase/queries/
+-Place validation schemas in lib/validations/
+-Place custom hooks in lib/hooks/
+
+## Component Development
+
+-Use Server Components by default for all page components
+-Only use 'use client' for components requiring interactivity, hooks, or browser APIs
+-Always implement loading and error states for async operations
+-Wrap all forms in proper error boundaries
+-Use consistent component naming: PascalCase for components, camelCase for functions
+-Export components as default exports from their files
+-Always include TypeScript interfaces for props
+
+## Database Integration (Supabase)
+
+-Always use Row Level Security (RLS) on all tables
+-Include user_id field in all user-created resources
+-Use createServerComponentClient for server components
+-Use createClientComponentClient for client components
+-Use createRouteHandlerClient for API routes
+-Always handle Supabase errors with proper error messages
+-Implement real-time subscriptions for interactive features
+-Always validate user permissions before database operations
+
+## Form Development Standards
+
+-Use React Hook Form with zodResolver for all forms
+-Define Zod schemas in lib/validations/ directory
+-Always include loading states during form submission
+-Implement proper error handling and user feedback
+-Use shadcn/ui Form components exclusively
+-Always validate data both client-side and server-side
+-Include cancel buttons that navigate back
+-Show clear success/error messages after form submission
+
+## API Route Patterns
+
+-Always check authentication in API routes first
+-Use Zod schemas to validate request bodies
+-Return consistent JSON error responses
+-Implement proper HTTP status codes (200, 201, 400, 401, 404, 500)
+-Include detailed error logging for debugging
+-Follow RESTful conventions for endpoint naming
+-Always handle database errors gracefully
+
+## Styling Guidelines
+
+-Use Tailwind CSS utility classes exclusively
+-Follow responsive design patterns: sm:, md:, lg:, xl:
+-Use consistent spacing: p-4, py-8, space-y-6, gap-4
+-Apply hover and focus states for interactive elements
+-Use shadcn/ui theme variables for colors
+-Implement proper contrast ratios for accessibility
+-Use consistent typography scales
+
+## Authentication & Security
+
+-Always verify user authentication in protected routes
+-Redirect unauthenticated users to login page
+-Implement proper RLS policies for data access
+-Never expose sensitive data in client components
+-Validate all user inputs with Zod schemas
+-Use HTTPS for all external API calls
+-Sanitize user-generated content before display
+
+## Performance Optimization
+
+-Use Server Components for static content and data fetching
+-Implement proper loading states to prevent layout shift
+-Use React.memo for expensive re-renders only when needed
+-Lazy load non-critical components with next/dynamic
+-Optimize images with Next.js Image component
+-Implement proper caching strategies for API responses
+-Use Suspense boundaries for better user experience
+
+## Error Handling Requirements
+
+-Always wrap async operations in try-catch blocks
+-Provide user-friendly error messages
+-Log detailed errors for debugging purposes
+-Implement proper fallback UI for error states
+-Use React Error Boundaries for component-level errors
+-Handle network failures gracefully
+-Provide retry mechanisms for failed operations
+
+## Real-time Features
+
+-Use Supabase real-time subscriptions for live updates
+-Clean up subscriptions in useEffect cleanup functions
+-Handle connection states (connecting, connected, disconnected)
+-Implement optimistic updates for better UX
+-Batch real-time updates to prevent excessive re-renders
+-Handle subscription errors gracefully
+
+## Testing Requirements
+
+-Write unit tests for utility functions and hooks
+-Test form validation and submission flows
+-Test API routes with proper mocking
+-Include error case testing for all components
+-Test authentication and authorization flows
+-Verify real-time functionality works correctly
+-Test responsive design at different breakpoints

@@ -1,0 +1,110 @@
+---
+description: Supabase integration patterns, RLS policies, and real-time features for polling app
+globs: lib/supabase/**/*.ts, app/api/**/*.ts, lib/hooks/**/*.ts
+alwaysApply: true
+---
+
+# Supabase Integration Rules
+
+## Client Configuration
+
+- Use createServerComponentClient for server components and API routes
+- Use createClientComponentClient for client components only
+- Import cookies from 'next/headers' for server-side authentication
+- Never instantiate Supabase client in component render functions
+- Always handle authentication state changes properly
+- Use environment variables for Supabase configuration
+
+## Database Schema Standards
+
+- Include id as UUID primary key with gen_random_uuid() default
+- Always include user_id field referencing auth.users(id)
+- Add created_at and updated_at timestamp fields to all tables
+- Use descriptive column names with snake_case convention
+- Include proper foreign key constraints with ON DELETE CASCADE
+- Set up proper indexes for query performance
+
+## Row Level Security (RLS) Implementation
+
+- Enable RLS on all user-data tables: ALTER TABLE table_name ENABLE ROW LEVEL SECURITY
+- Create policies that filter by auth.uid() = user_id
+- Implement separate policies for SELECT, INSERT, UPDATE, DELETE
+- Use descriptive policy names that explain the access pattern
+- Test RLS policies with different user contexts
+- Never bypass RLS in application code
+
+## Database Queries Best Practices
+
+- Always use .select() to specify required columns
+- Include proper error handling for all database operations
+- Use .single() for queries that should return one row
+- Use .maybeSingle() when row might not exist
+- Chain filters efficiently: .eq(), .neq(), .gt(), .lt(), .in()
+- Use .order() for consistent result ordering
+- Implement pagination with .range() when needed
+
+## Authentication Integration
+
+- Always check session existence before protected operations
+- Use session.user.id for user context in queries
+- Handle authentication errors gracefully
+- Implement proper logout functionality
+- Check user roles and permissions where applicable
+- Never trust client-side authentication state alone
+
+## Real-time Subscriptions
+
+- Create channels with descriptive names
+- Use postgres_changes for database table changes
+- Specify exact table and schema in subscription filters
+- Clean up subscriptions in useEffect cleanup
+- Handle subscription errors and reconnection
+- Batch updates to prevent excessive re-renders
+- Use optimistic updates for better UX
+
+## API Route Patterns
+
+- Always verify authentication first in API routes
+- Use consistent error response format
+- Implement proper HTTP status codes
+- Log errors for debugging while sanitizing sensitive data
+- Use transactions for multi-table operations
+- Implement rate limiting for public endpoints
+- Validate request data with Zod schemas
+
+## Query Organization
+
+- Group related queries in files by resource type
+- Export query functions with descriptive names
+- Include JSDoc comments for complex queries
+- Use TypeScript interfaces for query results
+- Implement query caching where appropriate
+- Handle query loading and error states consistently
+
+## Data Mutations
+
+- Use transactions for operations affecting multiple tables
+- Implement optimistic updates for immediate UI feedback
+- Validate data before and after mutations
+- Handle concurrent modification conflicts
+- Return updated data from mutation operations
+- Clear relevant caches after mutations
+
+## File Storage Integration
+
+- Use Supabase Storage for user-uploaded files
+- Implement proper file validation (size, type, etc.)
+- Create storage policies for file access control
+- Use signed URLs for private file access
+- Handle file upload progress and errors
+- Implement file deletion when records are removed
+
+## Performance Optimization
+
+- Use computed columns for frequently calculated values
+- Implement database-level constraints for data integrity
+- Use materialized views for complex aggregations
+- Index frequently queried columns
+- Avoid N+1 query patterns
+- Use batch operations for multiple insertions
+- Cache frequently accessed data appropriately
