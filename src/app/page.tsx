@@ -12,7 +12,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+    <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

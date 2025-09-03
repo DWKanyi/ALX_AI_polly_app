@@ -5,7 +5,7 @@ import { AuthProvider } from './auth/context/AuthContext';
 
 const Layout = ({ children }) => {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body>
         <AuthProvider>
           <Navbar />

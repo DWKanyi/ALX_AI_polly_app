@@ -1,75 +1,89 @@
 import { Poll } from '@/components/ui/pollCard';
+import { createClient } from '@/lib/supabase';
 
-// Mock data for development
-const mockPolls: Poll[] = [
-  {
-    id: '1',
-    title: 'What\'s your favorite programming language in 2024?',
-    description: 'Help us understand the current trends in software development',
-    options: ['JavaScript', 'Python', 'TypeScript', 'Rust', 'Go', 'Java'],
-    votes: 1247,
-    category: 'Technology',
-    createdAt: '2024-01-15T10:00:00Z',
-    expiresAt: '2024-12-31T23:59:59Z',
-    isActive: true
-  },
-  {
-    id: '2',
-    title: 'Best remote work setup for productivity?',
-    description: 'Share your insights on remote work environments',
-    options: ['Home office', 'Co-working space', 'Coffee shop', 'Library'],
-    votes: 892,
-    category: 'Lifestyle',
-    createdAt: '2024-01-10T14:30:00Z',
-    expiresAt: '2024-12-15T23:59:59Z',
-    isActive: true
-  },
-  {
-    id: '3',
-    title: 'Most anticipated movie release this year?',
-    description: 'Vote for the movie you\'re most excited to watch',
-    options: ['Dune: Part Two', 'Avengers: Secret Wars', 'The Batman 2', 'Spider-Man 4'],
-    votes: 2156,
-    category: 'Entertainment',
-    createdAt: '2024-01-05T09:15:00Z',
-    expiresAt: '2024-11-30T23:59:59Z',
-    isActive: true
-  },
-  {
-    id: '4',
-    title: 'Preferred way to learn new skills?',
-    description: 'How do you usually acquire new knowledge and skills?',
-    options: ['Online courses', 'Books', 'YouTube tutorials', 'Hands-on practice', 'Bootcamps'],
-    votes: 1543,
-    category: 'Education',
-    createdAt: '2024-01-20T16:45:00Z',
-    expiresAt: '2024-12-20T23:59:59Z',
-    isActive: true
-  }
-];
-
-// Simulate API delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const supabase = createClient();
 
 export const fetchPolls = async (): Promise<Poll[]> => {
-  // Simulate network delay
-  await delay(800);
-  return mockPolls;
+  const { data, error } = await supabase
+    .from('polls')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching polls:', error);
+    throw new Error(error.message);
+  }
+
+  // The data from Supabase might not match the Poll type exactly.
+  // We need to map it to ensure type safety.
+  return data.map((poll: any) => ({
+    id: poll.id,
+    title: poll.title,
+    description: poll.description,
+    options: poll.options || [],
+    votes: poll.votes || 0,
+    category: poll.category,
+    createdAt: poll.created_at,
+    expiresAt: poll.expires_at,
+    isActive: poll.is_active,
+  }));
 };
 
 export const fetchPollById = async (id: string): Promise<Poll | null> => {
-  await delay(500);
-  return mockPolls.find(poll => poll.id === id) || null;
+  const { data, error } = await supabase
+    .from('polls')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error(`Error fetching poll with id ${id}:`, error);
+    return null;
+  }
+  if (!data) return null;
+
+  return {
+    id: data.id,
+    title: data.title,
+    description: data.description,
+    options: data.options || [],
+    votes: data.votes || 0,
+    category: data.category,
+    createdAt: data.created_at,
+    expiresAt: data.expires_at,
+    isActive: data.is_active,
+  };
 };
 
-export const createPoll = async (pollData: Omit<Poll, 'id' | 'votes' | 'createdAt'>): Promise<Poll> => {
-  await delay(1000);
-  const newPoll: Poll = {
-    ...pollData,
-    id: Math.random().toString(36).substr(2, 9),
-    votes: 0,
-    createdAt: new Date().toISOString(),
+export const createPoll = async (pollData: Omit<Poll, 'id' | 'votes' | 'createdAt' | 'isActive'>): Promise<Poll> => {
+  const { data, error } = await supabase
+    .from('polls')
+    .insert([
+      {
+        title: pollData.title,
+        description: pollData.description,
+        options: pollData.options,
+        category: pollData.category,
+        expires_at: pollData.expiresAt,
+      },
+    ])
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating poll:', error);
+    throw new Error(error.message);
+  }
+
+  return {
+    id: data.id,
+    title: data.title,
+    description: data.description,
+    options: data.options || [],
+    votes: data.votes || 0,
+    category: data.category,
+    createdAt: data.created_at,
+    expiresAt: data.expires_at,
+    isActive: data.is_active,
   };
-  mockPolls.push(newPoll);
-  return newPoll;
 };
