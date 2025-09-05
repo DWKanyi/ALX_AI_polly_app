@@ -1,10 +1,4 @@
-FROM node:22
-
-# Skip SSL verification for Alpine package manager (temporary fix)
-RUN apk update --no-cache || true
-
-# Set npm to not use strict SSL
-RUN npm config set strict-ssl false
+FROM node:22-alpine
 
 # Create app directory
 WORKDIR /app
@@ -21,5 +15,5 @@ COPY . .
 # Expose port
 EXPOSE 3000
 
-# Start the application
+# Start the application in dev mode
 CMD ["npm", "run", "dev", "--", "--hostname", "0.0.0.0"]

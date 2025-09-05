@@ -1,4 +1,4 @@
-import { Poll } from '@/components/ui/pollCard';
+import { Poll, PollOption } from '@/types';
 import { createClient } from '@/lib/supabase';
 import { SupabaseClient } from '@supabase/supabase-js';
 
@@ -12,19 +12,25 @@ function getSupabaseClient() {
   return supabase;
 }
 
-// Helper function to map Supabase data to our Poll type
+// Helper function to map Supabase data (with nested poll_options) to our Poll type
 const mapSupabaseDataToPoll = (data: any): Poll => {
-  if (!data) return null;
   return {
     id: data.id,
+    userId: data.user_id,
     title: data.title,
     description: data.description,
-    options: data.options || [],
-    votes: data.votes || 0,
-    category: data.category,
-    createdAt: data.created_at,
+    isMultiple: data.is_multiple,
     expiresAt: data.expires_at,
-    isActive: data.is_active,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+    options: Array.isArray(data.poll_options)
+      ? data.poll_options.map((o: any) => ({
+          id: o.id,
+          pollId: o.poll_id,
+          label: o.label,
+          orderIndex: o.order_index,
+        }))
+      : undefined,
   };
 };
 
@@ -32,7 +38,7 @@ export const fetchPolls = async (): Promise<Poll[]> => {
   const client = getSupabaseClient();
   const { data, error } = await client
     .from('polls')
-    .select('*')
+    .select('id,user_id,title,description,is_multiple,expires_at,created_at,updated_at,poll_options(id,poll_id,label,order_index)')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -47,7 +53,7 @@ export const fetchPollById = async (id: string): Promise<Poll | null> => {
   const client = getSupabaseClient();
   const { data, error } = await client
     .from('polls')
-    .select('*')
+    .select('id,user_id,title,description,is_multiple,expires_at,created_at,updated_at,poll_options(id,poll_id,label,order_index)')
     .eq('id', id)
     .single();
 
@@ -61,26 +67,59 @@ export const fetchPollById = async (id: string): Promise<Poll | null> => {
   return mapSupabaseDataToPoll(data);
 };
 
-export const createPoll = async (pollData: Omit<Poll, 'id' | 'votes' | 'createdAt' | 'isActive'>): Promise<Poll> => {
+export const createPoll = async (
+  input: {
+    title: string;
+    description?: string | null;
+    isMultiple?: boolean;
+    expiresAt?: string | null;
+    options: { label: string }[];
+  }
+): Promise<Poll> => {
   const client = getSupabaseClient();
-  const { data, error } = await client
+  const { data: auth } = await client.auth.getUser();
+  const userId = auth.user?.id;
+  if (!userId) throw new Error('Not authenticated');
+
+  const { data: poll, error: pollError } = await client
     .from('polls')
     .insert([
       {
-        title: pollData.title,
-        description: pollData.description,
-        options: pollData.options,
-        category: pollData.category,
-        expires_at: pollData.expiresAt,
+        user_id: userId,
+        title: input.title,
+        description: input.description ?? null,
+        is_multiple: input.isMultiple ?? false,
+        expires_at: input.expiresAt ?? null,
       },
     ])
-    .select()
+    .select('id,user_id,title,description,is_multiple,expires_at,created_at,updated_at')
     .single();
 
-  if (error) {
-    console.error('Supabase API Error [createPoll]:', error.message);
-    throw new Error(`Failed to create poll: ${error.message}`);
+  if (pollError) {
+    console.error('Supabase API Error [createPoll:poll]:', pollError.message);
+    throw new Error(`Failed to create poll: ${pollError.message}`);
   }
 
-  return mapSupabaseDataToPoll(data);
+  if (input.options?.length) {
+    const optionsPayload = input.options.map((o, index) => ({
+      poll_id: poll.id,
+      label: o.label,
+      order_index: index,
+    }));
+    const { error: optionsError } = await client
+      .from('poll_options')
+      .insert(optionsPayload);
+    if (optionsError) {
+      console.error('Supabase API Error [createPoll:options]:', optionsError.message);
+      throw new Error(`Failed to create poll options: ${optionsError.message}`);
+    }
+  }
+
+  const { data: final } = await client
+    .from('polls')
+    .select('id,user_id,title,description,is_multiple,expires_at,created_at,updated_at,poll_options(id,poll_id,label,order_index)')
+    .eq('id', poll.id)
+    .single();
+
+  return mapSupabaseDataToPoll(final);
 };

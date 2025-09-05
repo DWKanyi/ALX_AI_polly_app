@@ -1,26 +1,28 @@
 "use client"
 
 import { useEffect, useState } from 'react';
-import { PollCard, Poll } from '@/components/ui/pollCard';
-import { fetchPolls } from '@/lib/api';
+import { PollCard } from '@/components/ui/pollCard';
+import { type Poll } from '@/types';
 import withAuth from '@/app/auth/withAuth';
 
 const ViewPollsPage = () => {
   const [polls, setPolls] = useState<Poll[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadPolls = async () => {
       try {
-        const fetchedPolls = await fetchPolls();
-        setPolls(fetchedPolls);
-      } catch (error) {
-        console.error('Error fetching polls:', error);
+        const res = await fetch('/api/polls', { cache: 'no-store' });
+        if (!res.ok) throw new Error(`Failed to load polls (${res.status})`);
+        const data = await res.json();
+        setPolls(data);
+      } catch (e: any) {
+        setError(e?.message || 'Failed to load polls');
       } finally {
         setLoading(false);
       }
     };
-
     loadPolls();
   }, []);
 
@@ -43,14 +45,18 @@ const ViewPollsPage = () => {
             Explore and participate in polls from our community
           </p>
         </div>
-        
+
+        {error && (
+          <div className="text-center text-red-400 mb-6">{error}</div>
+        )}
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {polls.map((poll) => (
             <PollCard key={poll.id} poll={poll} />
           ))}
         </div>
-        
-        {polls.length === 0 && (
+
+        {polls.length === 0 && !error && (
           <div className="text-center text-gray-300">
             <p>No polls available at the moment.</p>
           </div>
